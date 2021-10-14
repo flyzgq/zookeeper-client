@@ -1,0 +1,8 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: zookeeper
+zookeeper:
+  addr: 192.168.1.15:2181
+  sessionTimeout: 60000
