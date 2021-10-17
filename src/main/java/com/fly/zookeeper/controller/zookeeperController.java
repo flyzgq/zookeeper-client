@@ -62,7 +62,7 @@ public class zookeeperController {
                     log.info(watchedEvent.getPath());
                 }
             }, stat);
-                 //log.info(stat.toString());
+                 log.info(stat.toString());
         } catch (KeeperException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
