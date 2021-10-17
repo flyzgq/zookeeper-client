@@ -2,6 +2,7 @@ package com.fly.zookeeper.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -11,6 +12,8 @@ import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author fly
@@ -26,52 +29,36 @@ public class zookeeperController {
     @Autowired
     private ZooKeeper zooKeeper;
 
-
     @ApiOperation(value = "获取数据")
     @GetMapping("/data")
-    public String getData(){
-        byte[] data = new byte[0];
-        try {
-            data = zooKeeper.getData("/tuling", true, null);
-        } catch (KeeperException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+    public String getData() throws InterruptedException, KeeperException {
+        byte[] data = zooKeeper.getData("/tuling", true, null);
         return new String(data);
     }
 
 
     @ApiOperation(value = "zookeeper监听数据")
     @GetMapping("/watch")
-    public String getWatchData(){
-        byte[] data = null;
+    public String getWatchData() throws InterruptedException, KeeperException {
         Stat stat = new Stat();
-        try {
-                 data = zooKeeper.getData("/tuling", new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    try {
-                        zooKeeper.getData(watchedEvent.getPath(), this, null);
-                    } catch (KeeperException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    log.info(watchedEvent.getPath());
-                }
-            }, stat);
-                 log.info(stat.toString());
-        } catch (KeeperException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        byte[] data = zooKeeper.getData("/tuling", new Watcher() {
+            @SneakyThrows
+            @Override
+            public void process(WatchedEvent watchedEvent) {
+                zooKeeper.getData(watchedEvent.getPath(), this, null);
+                log.info(watchedEvent.getPath());
+            }
+        }, stat);
+        log.info(stat.toString());
         return new String(data);
     }
 
-
+    @ApiOperation(value = "获取子节点")
+    @GetMapping("/getChildren")
+    public String getChildren() throws InterruptedException, KeeperException {
+        List<String> children = zooKeeper.getChildren("/tuling", watchedEvent -> log.info(watchedEvent.getPath()));
+        children.forEach(log::info);
+        return "zookeeper children";
+    }
 
 }
