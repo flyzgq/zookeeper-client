@@ -4,6 +4,6 @@ spring:
   application:
     name: zookeeper
 zookeeper:
-  #addr: 192.168.1.15:2181
-  addr: 127.0.0.1:2181
+  addr: 192.168.1.15:2181
+  #addr: 127.0.0.1:2181
   sessionTimeout: 60000
