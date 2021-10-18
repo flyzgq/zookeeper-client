@@ -4,15 +4,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,4 +61,17 @@ public class zookeeperController {
         return "zookeeper children";
     }
 
+    @ApiOperation("创建节点")
+    @GetMapping("/createData")
+    public void createData() throws KeeperException, InterruptedException {
+        List<ACL> list = new ArrayList<>() ;
+        int perms =ZooDefs.Perms.ADMIN | ZooDefs.Perms.READ;
+        ACL acl1 = new ACL(perms, new Id("world", "anyone"));
+        ACL acl2 = new ACL(perms, new Id("ip", "192.168.1.158"));
+        ACL acl3 = new ACL(perms, new Id("ip", "127.0.0.1"));
+        list.add(acl1);
+        list.add(acl2);
+        list.add(acl3);
+        zooKeeper.create("/tuling/lu","hello".getBytes(), list, CreateMode.PERSISTENT);
+    }
 }
